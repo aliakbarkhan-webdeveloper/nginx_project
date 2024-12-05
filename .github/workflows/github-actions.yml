@@ -32,12 +32,12 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
 
-      - name: configuration of aws CLI
-        run: | 
-          mkdir -p ~/.aws
-          echo "[default]" > ~/.aws/credentials
-          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
-          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+      # - name: configuration of aws CLI
+      #   run: | 
+      #     mkdir -p ~/.aws
+      #     echo "[default]" > ~/.aws/credentials
+      #     echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+      #     echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
 
       #doning ssh
       - name: Set up SSH and login to EC2
