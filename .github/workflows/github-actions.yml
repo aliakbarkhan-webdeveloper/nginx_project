@@ -48,21 +48,30 @@ jobs:
           touch ~/.ssh/known_hosts
           ssh-keyscan -H 65.0.139.84 >> ~/.ssh/known_hosts
 
-      - name: deploing on EC2
-        run: | 
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@65.0.139.84 << 'EOF'
-          # SSH into EC2 and pull the image from Docker Hub
-          set -e
-          set -x
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest  # Pull the latest image from Docker Hub
-
-          # Stop any running containers
-          sudo docker stop my-nginx-container || true
-          docker rm my-nginx-container || true
-
-          # Run the new Docker container with NGINX
-          sudo docker run -d --name my-nginx-container -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
-
-          # Reload NGINX configuration (if needed)
-          sudo docker exec my-nginx-container nginx -s reload
-          EOF
+          - name: Deploying on EC2
+          run: | 
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@65.0.139.84 << 'EOF'
+            # SSH into EC2 and prepare the environment
+            set -e  # Exit on error
+            set -x  # Print commands
+        
+            # Install Docker if not already installed
+            if ! command -v docker &> /dev/null; then
+              sudo apt update
+              sudo apt install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+        
+            # Pull the latest image from Docker Hub
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
+        
+            # Stop any running containers
+            sudo docker stop my-nginx-container || true
+            sudo docker rm my-nginx-container || true
+        
+            # Run the new Docker container with NGINX
+            sudo docker run -d --name my-nginx-container -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
+        
+            EOF
+        
