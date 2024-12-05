@@ -31,23 +31,18 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
-      
+      #doning ssh
       - name: Set up SSH and login to EC2
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           touch ~/.ssh/known_hosts
-          ssh-keyscan -H ec2-65-2-63-98.ap-south-1.compute.amazonaws.com >> ~/.ssh/known_hosts
-      
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_IP }}  
-          username: ${{ secrets.EC2_USERNAME }}  
-          key: ${{ secrets.EC2_SSH_KEY }} 
-          port: 22 
-          script: |
+          ssh-keyscan -H ubuntu@ec2-65-0-139-84.ap-south-1.compute.amazonaws.com >> ~/.ssh/known_hosts
+
+      - name: deploing on EC2
+        run: | 
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ec2-65-0-139-84.ap-south-1.compute.amazonaws.com << 'EOF'
             # SSH into EC2 and pull the image from Docker Hub
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest  # Pull the latest image from Docker Hub
 
@@ -60,3 +55,4 @@ jobs:
 
             # Reload NGINX configuration (if needed)
             docker exec my-nginx-container nginx -s reload
+            EOF
