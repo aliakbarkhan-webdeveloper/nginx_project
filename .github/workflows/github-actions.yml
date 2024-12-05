@@ -38,12 +38,14 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           touch ~/.ssh/known_hosts
-          ssh-keyscan -H ubuntu@ec2-65-0-139-84.ap-south-1.compute.amazonaws.com >> ~/.ssh/known_hosts
+          ssh-keyscan -H ubuntu@65.0.139.84 >> ~/.ssh/known_hosts
 
       - name: deploing on EC2
         run: | 
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ec2-65-0-139-84.ap-south-1.compute.amazonaws.com << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@65.0.139.84 << 'EOF'
             # SSH into EC2 and pull the image from Docker Hub
+            set -e
+            set -x
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest  # Pull the latest image from Docker Hub
 
             # Stop any running containers
