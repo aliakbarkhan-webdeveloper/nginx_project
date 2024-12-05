@@ -31,6 +31,15 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
+
+      - name: configuration of aws CLI
+        run: | 
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+
+
       #doning ssh
       - name: Set up SSH and login to EC2
         run: |
@@ -42,19 +51,19 @@ jobs:
 
       - name: deploing on EC2
         run: | 
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@65.0.139.84 << 'EOF'
-            # SSH into EC2 and pull the image from Docker Hub
-            set -e
-            set -x
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest  # Pull the latest image from Docker Hub
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@65.0.139.84 << 'EOF'
+          # SSH into EC2 and pull the image from Docker Hub
+          set -e
+          set -x
+          docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest  # Pull the latest image from Docker Hub
 
-            # Stop any running containers
-            docker stop my-nginx-container || true
-            docker rm my-nginx-container || true
+          # Stop any running containers
+          docker stop my-nginx-container || true
+          docker rm my-nginx-container || true
 
-            # Run the new Docker container with NGINX
-            docker run -d --name my-nginx-container -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
+          # Run the new Docker container with NGINX
+          docker run -d --name my-nginx-container -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
 
-            # Reload NGINX configuration (if needed)
-            docker exec my-nginx-container nginx -s reload
-            EOF
+          # Reload NGINX configuration (if needed)
+          docker exec my-nginx-container nginx -s reload
+          EOF
