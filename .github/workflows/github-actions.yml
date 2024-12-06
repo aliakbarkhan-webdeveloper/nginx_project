@@ -46,11 +46,11 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           touch ~/.ssh/known_hosts
-          ssh-keyscan -H 65.0.139.84 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 13.201.137.159 >> ~/.ssh/known_hosts
 
       - name: Deploying on EC2
         run: | 
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@65.0.139.84 << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.201.137.159 << 'EOF'
           # SSH into EC2 and prepare the environment
           set -e  # Exit on error
           set -x  # Print commands
