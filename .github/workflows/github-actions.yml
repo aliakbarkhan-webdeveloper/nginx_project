@@ -71,7 +71,7 @@ jobs:
           sudo docker rm my-nginx-container || true
         
           # Run the new Docker container with NGINX
-          sudo docker run -d --name my-nginx-container -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
+          sudo docker run -d --name my-nginx-container -p 3000:80 ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest
         
           EOF
         
